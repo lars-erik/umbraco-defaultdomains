@@ -1,0 +1,14 @@
+﻿{
+    propertyEditors: [
+        {
+            alias: "defaultdomains.editor",
+            name: "Default Domains Editor",
+            editor: {
+                view: "~/App_Plugins/DefaultDomains/defaultdomains.editor.html"
+            }
+        }
+    ],
+    javascript: [
+        "~/App_Plugins/DefaultDomains/defaultdomains.js"
+    ]
+}
