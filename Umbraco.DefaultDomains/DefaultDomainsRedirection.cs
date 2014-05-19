@@ -29,6 +29,9 @@ namespace Umbraco.DefaultDomains
 
         private static void AddRedirects(object sender, EventArgs e)
         {
+            if (HttpContext.Current.IsDebuggingEnabled)
+                return;
+
             var firstName = FindExistingRedirect();
             var contentDomains = GetContentDomains();
 
@@ -60,7 +63,7 @@ namespace Umbraco.DefaultDomains
 
         private static void AddRule(ContentDomain contentDomain, string defaultDomain, string firstName)
         {
-            var contentDomainName = SchemeExpr.Replace(contentDomain.Domain.Name, "");
+            var contentDomainName = SchemeExpr.Replace(contentDomain.Domain.Name, "").TrimEnd('/');
             if (contentDomainName.Equals(defaultDomain, StringComparison.InvariantCultureIgnoreCase))
                 return;
 

@@ -223,6 +223,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\DefaultDomainsController.cs" />
     <Compile Include="DefaultDomainsRedirection.cs" />
     <Compile Include="DefaultDomainStartup.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -230,7 +231,9 @@
   <ItemGroup />
   <ItemGroup>
     <Content Include="App_Plugins\DefaultDomains\package.manifest" />
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Umbraco.DefaultDomains.nuspec" />
   </ItemGroup>
   <ItemGroup>
