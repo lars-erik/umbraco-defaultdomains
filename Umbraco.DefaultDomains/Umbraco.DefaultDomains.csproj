@@ -127,6 +127,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.SqlServerCe">
       <HintPath>..\packages\UmbracoCms.Core.7.1.2\lib\System.Data.SqlServerCe.dll</HintPath>
@@ -223,7 +224,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ContentDomains.cs" />
     <Compile Include="Controllers\DefaultDomainsController.cs" />
+    <Compile Include="DefaultDomainCanonicalHeaders.cs" />
     <Compile Include="DefaultDomainsRedirection.cs" />
     <Compile Include="DefaultDomainStartup.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -1,4 +1,6 @@
-﻿using Umbraco.Core;
+﻿using System;
+using System.Configuration;
+using Umbraco.Core;
 
 namespace Umbraco.DefaultDomains
 {
@@ -8,7 +10,20 @@ namespace Umbraco.DefaultDomains
         {
             base.ApplicationStarted(umbracoApplication, applicationContext);
 
-            DefaultDomainRedirection.Register();
+            var modeString = ConfigurationManager.AppSettings["Umbraco.DefaultDomains.Mode"];
+            var mode = DefaultDomainMode.CanonicalHeader;
+            Enum.TryParse(modeString, out mode);
+
+            if (mode == DefaultDomainMode.Redirect)
+                DefaultDomainRedirection.Register();
+            else
+                DefaultDomainCanonicalHeaders.Register(umbracoApplication, applicationContext);
         }
+    }
+
+    public enum DefaultDomainMode
+    {
+        Redirect,
+        CanonicalHeader
     }
 }

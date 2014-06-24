@@ -2,26 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text.RegularExpressions;
 using System.Web;
-using umbraco.cms.businesslogic.web;
 using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Core.Services;
 using UrlRewritingNet.Web;
 
 namespace Umbraco.DefaultDomains
 {
     public class DefaultDomainRedirection
     {
-        private const string PropertyEditorAlias = "defaultdomains.editor";
-        private static readonly Regex SchemeExpr = new Regex("(?:https?(?:://))+");
-
-        private static IContentService ContentService
-        {
-            get { return ApplicationContext.Current.Services.ContentService; }
-        }
-
         public static void Register()
         {
             UmbracoApplicationBase.ApplicationInit += AddRedirects;
@@ -32,8 +21,11 @@ namespace Umbraco.DefaultDomains
             if (HttpContext.Current.IsDebuggingEnabled)
                 return;
 
+            if (HttpContext.Current.Request.Url.Host.Equals("localhost", StringComparison.CurrentCultureIgnoreCase))
+                return;
+
             var firstName = FindExistingRedirect();
-            var contentDomains = GetContentDomains();
+            var contentDomains = ContentDomains.GetContentDomains();
 
             foreach (var group in contentDomains)
                 AddRules(group, firstName);
@@ -50,9 +42,9 @@ namespace Umbraco.DefaultDomains
                 rewrites.Cast<RegExRewriteRule>().Select(r => String.Format("{0} => {1}", r.VirtualUrl, r.DestinationUrl)));
         }
 
-        private static void AddRules(IGrouping<IContent, ContentDomain> group, string firstName)
+        private static void AddRules(IGrouping<IContent, ContentDomains.ContentDomain> group, string firstName)
         {
-            var defaultDomain = GetDefaultDomain(group.Key);
+            var defaultDomain = ContentDomains.GetDefaultDomain(group.Key);
 
             if (String.IsNullOrWhiteSpace(defaultDomain))
                 return;
@@ -61,9 +53,9 @@ namespace Umbraco.DefaultDomains
                 AddRule(contentDomain, defaultDomain, firstName);
         }
 
-        private static void AddRule(ContentDomain contentDomain, string defaultDomain, string firstName)
+        private static void AddRule(ContentDomains.ContentDomain contentDomain, string defaultDomain, string firstName)
         {
-            var contentDomainName = SchemeExpr.Replace(contentDomain.Domain.Name, "").TrimEnd('/');
+            var contentDomainName = ContentDomains.SchemeExpr.Replace(contentDomain.Domain.Name, "").TrimEnd('/');
             if (contentDomainName.Equals(defaultDomain, StringComparison.InvariantCultureIgnoreCase))
                 return;
 
@@ -107,52 +99,6 @@ namespace Umbraco.DefaultDomains
             var module = (UrlRewriteModule)HttpContext.Current.ApplicationInstance.Modules["UrlRewriteModule"];
             var rewrites = (List<RewriteRule>)module.GetType().GetProperty("Redirects", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(module);
             return rewrites;
-        }
-
-        private static IEnumerable<IGrouping<IContent, ContentDomain>> GetContentDomains()
-        {
-            var domains = Domain.GetDomains().ToList();
-            var contentDomains = domains.
-                Join(
-                    GetRootContent(domains),
-                    d => d.RootNodeId,
-                    c => c.Id,
-                    (d, c) => new ContentDomain(d, c)
-                )
-                .GroupBy(cd => cd.Content);
-            return contentDomains;
-        }
-
-        private static IEnumerable<IContent> GetRootContent(IEnumerable<Domain> domains)
-        {
-            var rootIds = domains.Select(d => d.RootNodeId).Distinct();
-            return ContentService.GetByIds(rootIds);
-        }
-
-        private static string GetDefaultDomain(IContentBase root)
-        {
-            var propType = root.PropertyTypes.FirstOrDefault(pt => pt.PropertyEditorAlias == PropertyEditorAlias);
-            if (propType == null)
-                return null;
-            var prop = root.Properties.FirstOrDefault(p => p.Alias == propType.Alias);
-            if (prop == null)
-                return null;
-            if (prop.Value == null)
-                return null;
-
-            return SchemeExpr.Replace((string)prop.Value, "");
-        }
-
-        private class ContentDomain
-        {
-            public Domain Domain { get; set; }
-            public IContent Content { get; set; }
-
-            public ContentDomain(Domain domain, IContent content)
-            {
-                Domain = domain;
-                Content = content;
-            }
         }
     }
 }
