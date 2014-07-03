@@ -8,6 +8,7 @@ using System.Web;
 using System.Web.UI.WebControls;
 using umbraco.cms.businesslogic.web;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Web;
 using Umbraco.Web.Routing;
 
@@ -27,20 +28,29 @@ namespace Umbraco.DefaultDomains
             var contentRequest = ((PublishedContentRequest) sender);
 
             if (!contentRequest.HasPublishedContent)
+            { 
+                LogHelper.Debug<DefaultDomainCanonicalHeaders>("No published request");
                 return;
+            }
 
             var allDomains = Domain.GetDomains();
             var domainNode = contentRequest.PublishedContent.Ancestors()
                 .FirstOrDefault(c => allDomains.Any(d => d.RootNodeId == c.Id));
 
             if (domainNode == null)
+            {
+                LogHelper.Debug<DefaultDomainCanonicalHeaders>("No domain node for " + contentRequest.PublishedContent.Name);
                 return;
+            }
 
             var domainContent = UmbracoContext.Current.Application.Services.ContentService.GetById(domainNode.Id);
             var defaultDomain = ContentDomains.GetDefaultDomain(domainContent);
 
-            if (defaultDomain == null)
+            if (String.IsNullOrWhiteSpace(defaultDomain))
+            {
+                LogHelper.Debug<DefaultDomainCanonicalHeaders>("No default domain for " + contentRequest.PublishedContent.Name);
                 return;
+            }
 
             var application = HttpContext.Current;
 
@@ -48,6 +58,7 @@ namespace Umbraco.DefaultDomains
                 new Uri("http://" + defaultDomain),
                 RequestUrl(application).GetComponents(UriComponents.PathAndQuery, UriFormat.UriEscaped)
                 );
+            LogHelper.Debug<DefaultDomainCanonicalHeaders>("Found canonical url for " + contentRequest.PublishedContent.Name);
             application.Response.AddHeader("Link", String.Format("<{0}>; rel=\"canonical\"", canonicalUrl));
         }
 
