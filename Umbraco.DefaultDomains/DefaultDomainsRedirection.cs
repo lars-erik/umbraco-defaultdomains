@@ -21,8 +21,12 @@ namespace Umbraco.DefaultDomains
             if (HttpContext.Current.IsDebuggingEnabled)
                 return;
 
-            if (HttpContext.Current.Request.Url.Host.Equals("localhost", StringComparison.CurrentCultureIgnoreCase))
-                return;
+            try
+            { 
+                if (HttpContext.Current.Request.Url.Host.Equals("localhost", StringComparison.CurrentCultureIgnoreCase))
+                    return;
+            }
+            catch { }
 
             var firstName = FindExistingRedirect();
             var contentDomains = ContentDomains.GetContentDomains();

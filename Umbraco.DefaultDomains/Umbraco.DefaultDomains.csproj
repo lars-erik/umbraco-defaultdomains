@@ -226,6 +226,7 @@
   <ItemGroup>
     <Compile Include="ContentDomains.cs" />
     <Compile Include="Controllers\DefaultDomainsController.cs" />
+    <Compile Include="Controls\DefaultDomainsLegacyControl.cs" />
     <Compile Include="DefaultDomainCanonicalHeaders.cs" />
     <Compile Include="DefaultDomainsRedirection.cs" />
     <Compile Include="DefaultDomainStartup.cs" />
