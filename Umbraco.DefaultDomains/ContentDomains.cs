@@ -44,7 +44,7 @@ namespace Umbraco.DefaultDomains
         {
             var propType = root.PropertyTypes.FirstOrDefault(pt => pt.DataTypeId == DefaultDomainsLegacyControl.DataTypeId);
             if (propType == null && IsUmbraco7)
-                root.PropertyTypes.FirstOrDefault(pt => pt.PropertyEditorAlias.Equals(PropertyEditorAlias, System.StringComparison.InvariantCultureIgnoreCase));
+                propType = root.PropertyTypes.FirstOrDefault(pt => pt.PropertyEditorAlias.Equals(PropertyEditorAlias, System.StringComparison.InvariantCultureIgnoreCase));
             if (propType == null)
                 return null;
             var prop = root.Properties.FirstOrDefault(p => p.Alias == propType.Alias);
