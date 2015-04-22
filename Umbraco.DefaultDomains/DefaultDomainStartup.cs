@@ -11,19 +11,20 @@ namespace Umbraco.DefaultDomains
             base.ApplicationStarted(umbracoApplication, applicationContext);
 
             var modeString = ConfigurationManager.AppSettings["Umbraco.DefaultDomains.Mode"];
-            var mode = DefaultDomainMode.CanonicalHeader;
+            DefaultDomainMode mode;
             Enum.TryParse(modeString, out mode);
 
             if (mode == DefaultDomainMode.Redirect)
-                DefaultDomainRedirection.Register();
-            else
-                DefaultDomainCanonicalHeaders.Register(umbracoApplication, applicationContext);
+                throw new Exception("Vi bruker ikke Redirect lenger");
+                //DefaultDomainRedirection.Register();
+
+            DefaultDomainCanonicalHeaders.Register(umbracoApplication, applicationContext);
         }
     }
 
     public enum DefaultDomainMode
     {
-        Redirect,
-        CanonicalHeader
+        CanonicalHeader,
+        Redirect
     }
 }
