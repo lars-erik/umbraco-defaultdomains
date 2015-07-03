@@ -34,8 +34,10 @@ namespace Umbraco.DefaultDomains
             }
 
             var allDomains = Domain.GetDomains();
-            var domainNode = contentRequest.PublishedContent.Ancestors()
-                .FirstOrDefault(c => allDomains.Any(d => d.RootNodeId == c.Id));
+            var nodesWithDomain = contentRequest.PublishedContent.Ancestors()
+                .Reverse()
+                .Where(c => allDomains.Any(d => d.RootNodeId == c.Id));
+            var domainNode = nodesWithDomain.FirstOrDefault();
 
             if (domainNode == null)
             {
