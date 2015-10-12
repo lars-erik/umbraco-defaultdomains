@@ -10,7 +10,7 @@
         content = findContent(scope);
         scope.domains = [];
 
-        http.get("/umbraco/api/defaultdomains/getdomains", {
+        http.get("/umbraco/backoffice/api/defaultdomains/getdomains", {
             params: {
                 id: content.id
             }})
