@@ -53,7 +53,7 @@ namespace Umbraco.DefaultDomains
             if (prop.Value == null)
                 return null;
 
-            return SchemeExpr.Replace((string)prop.Value, "");
+            return (string)prop.Value;
         }
 
         public class ContentDomain

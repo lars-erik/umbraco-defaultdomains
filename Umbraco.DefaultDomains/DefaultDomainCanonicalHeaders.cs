@@ -35,7 +35,6 @@ namespace Umbraco.DefaultDomains
 
             var allDomains = Domain.GetDomains();
             var nodesWithDomain = contentRequest.PublishedContent.Ancestors()
-                .Reverse()
                 .Where(c => allDomains.Any(d => d.RootNodeId == c.Id));
             var domainNode = nodesWithDomain.FirstOrDefault();
 
@@ -55,14 +54,25 @@ namespace Umbraco.DefaultDomains
             }
 
             var application = HttpContext.Current;
+            var defaultDomainUrl = AddDefaultSchemeIfMissing(defaultDomain);
 
             var canonicalUrl = new Uri(
-                new Uri("http://" + defaultDomain),
+                new Uri(defaultDomainUrl),
                 RequestUrl(application).GetComponents(UriComponents.PathAndQuery, UriFormat.UriEscaped)
                 );
             LogHelper.Debug<DefaultDomainCanonicalHeaders>("Found canonical url for " + contentRequest.PublishedContent.Name);
             application.Response.AddHeader("Link", String.Format("<{0}>; rel=\"canonical\"", canonicalUrl));
         }
+
+
+        private static string AddDefaultSchemeIfMissing(string defaultDomain)
+        {
+            if (defaultDomain.Contains("http"))
+                return defaultDomain;
+
+            return "http://" + defaultDomain;
+        }
+
 
         private static bool IsCurrentDomain(HttpContext application, ContentDomains.ContentDomain c)
         {
