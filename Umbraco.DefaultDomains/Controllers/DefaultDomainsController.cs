@@ -5,8 +5,7 @@ using Umbraco.Web.WebApi;
 
 namespace Umbraco.DefaultDomains.Controllers
 {
-    [UmbracoAuthorize]
-    public class DefaultDomainsController : UmbracoApiController
+    public class DefaultDomainsController : UmbracoAuthorizedApiController
     {
         public IEnumerable<string> GetDomains(int id)
         {
